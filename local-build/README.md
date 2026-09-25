@@ -1,18 +1,16 @@
-# 🛠️ Local ZMK Firmware Builds (Dockerized)
+# Local ZMK Firmware Builds (Dockerized)
 
-This setup provides a **fast, containerized build environment** for [ZMK Firmware](https://zmk.dev), allowing you to compile firmware locally without pushing changes to GitHub or installing any toolchains on your system.
+This setup provides a fast, containerized build environment for [ZMK Firmware](https://zmk.dev), allowing you to compile firmware locally without pushing changes to GitHub or installing any toolchains on your system.
 
-- **Rapid feedback loop for keymap and overlay changes**
-- **No GitHub Actions delay**
-- **No toolchain installation required**
-- **Cross-platform, reproducible builds**
-- **Automatic shield and keymap discovery**
-- **PMW3610 driver integration**
-- **Isolated build sandboxes for each shield**
-- **ZMK Studio USB-UART support**
-- **Artifacts are published by keymap to a persistent folder for easy access**
+- Rapid feedback loop for keymap and overlay changes
+- No GitHub Actions delay
+- No toolchain installation required
+- Cross-platform, reproducible builds
+- Automatic shield and keymap discovery from build.yaml
+- Isolated build sandboxes per shield
+- ZMK Studio USB-UART support on central shields
+- Artifacts published by format and keymap to a persistent folder for easy access
 
----
 
 ## Quick Start
 
@@ -24,83 +22,74 @@ Make sure you have:
 - [Docker Compose](https://docs.docker.com/compose/install/)
 - This repository cloned on your host machine
 
----
 
 ### 2. Start the Build Container
 
 ```bash
-cd local-build
-docker-compose run --rm builder
+docker-compose -f local-build/docker-compose.yml run --rm builder
 ```
 
-### 3. Firmware Output
+### 3. Flash the Firmware
 
-Firmware files will be placed in under the firmwares directory in the root of the repo on your host. They will be grouped by format (bt/dongle) and keymap:
+Firmware files are placed under the `firmwares/` directory at the root of the repo.
 
-```bash
-firmwares/
-├── charybdis_bt
-│   ├── colemak_dh
-│   │   ├── charybdis_left.uf2
-│   │   └── charybdis_right.uf2
-│   └── qwerty
-│       ├── charybdis_left.uf2
-│       └── charybdis_right.uf2
-├── charybdis_dongle
-│   ├── colemak_dh
-│   │   ├── charybdis_dongle.uf2
-│   │   ├── charybdis_left.uf2
-│   │   └── charybdis_right.uf2
-│   └── qwerty
-│       ├── charybdis_dongle.uf2
-│       ├── charybdis_left.uf2
-│       └── charybdis_right.uf2
-└── settings_reset.uf2
-```
 
----
+## Troubleshooting
 
-## 💡 Tips
-
-### Drop into a shell for troubleshooting
+### Drop into a shell in the build container
 
 This will give you an interactive bash prompt with all dependencies loaded, so you can run or debug the script manually:
 
 ```bash
 docker-compose run --rm --entrypoint bash builder
 ```
-Once inside the shell, you can execute the script manually, or go troubleshooting:
+
+Once inside the shell, you can manually test/troubleshoot or you can execute the script manually:
 
 ```bash
 bash ./local-build/build_setup.sh
 ```
 
----
+### Runtime USB Logging
 
-## Troubleshooting
+Enable USB logging to troubleshoot the firmware while it's running on the keyboard. This is disabled by default due to the significant negative impact on battery life, but can easily be enabled for testing through an environment variable in the build command:
 
-- Enable USB logging to troubleshoot the firmware while it's running.
-  - This is disabled by default since it has a significant negative impact on battery life
-  - To turn it on, enable the variable at the top of the [build script](local-build/build_setup.sh), then follow instructions [here](https://zmk.dev/docs/development/usb-logging) to see the log stream on your computer.
-  - Since this is a split keyboard you'll likely have to use `sudo tio /dev/ttyACM1` or `sudo tio /dev/ttyACM2` depending on what side you want to see logs for.
-    - If you don't know what tty devices your system can see, run this command to find out `ls -l /dev/serial/by-id`
-    - To see the PMW3610 sensor logs you'll also need to enable the following Kconfig options in `config/charybdis_right.conf`
-      - CONFIG_LOG=y
-      - CONFIG_LOG_DEFAULT_LEVEL=3
-      - CONFIG_LOG_MODE_DEFERRED=n
-      - CONFIG_PMW3610_LOG_LEVEL_DBG=y
-      - CONFIG_LOG_BACKEND_UART=y
-      - CONFIG_USB_CDC_ACM=y
-      - CONFIG_LOG_MODE_DEFERRED=n
-- If the firmware is not generated as expected, use the interactive shell method above to inspect `/workspaces/zmk-firmwares` or rerun the script with debugging.
-- Check the script output for any warnings or errors about missing shields, keymaps, or build failures. If you'd like to save the script output to a file for local parsing in a text editor start the build container with this command:
+```bash
+ENABLE_USB_LOGGING=true docker-compose -f local-build/docker-compose.yml run --rm builder
+```
+
+Follow instructions [here](https://zmk.dev/docs/development/usb-logging) to see the log stream on your computer.
+
+Since this is a split keyboard you'll have to change the tty device depending on what you want log output from (e.g. `ttyACM0` for dongle, `ttyACM1` for right side, and `ttyACM2` for left side.
+
+To enable PMW3610 sensor debug logging, also uncomment `CONFIG_PMW3610_ALT_LOG_LEVEL_DBG=y` in the relevant shield conf.
+
+### Local Module Testing
+
+When you deliberately want to build whatever is already checked out in your local module folders use the `SKIP_WEST_UPDATE=true` environment variable:
+
+```bash
+SKIP_WEST_UPDATE=true docker-compose -f local-build/docker-compose.yml run --rm builder
+```
+
+Normal builds should not use this so `west update` can pull the configured module revisions.
+
+### Patched APDS9960 Zephyr Driver
+
+The Prospector APDS9960 sensor builds expect Zephyr's stock APDS9960 driver to be disabled and the Prospector module replacement driver to be enabled.
+
+The build script prints a resolved APDS9960 config block after each build so this is visible in the terminal output.
+
+### Build Logs
+
+Check the build script output for any warnings or errors. Most of the times it's a simple missing shield/keymaps, but sometimes it'll be a valid build failures. To save the output to a file for parsing and review:
+
   ```bash
   docker-compose run --rm builder > logs.txt 2>&1
   ```
 
----
 
-## 📚 More Resources
+## More Resources
 
 - [ZMK Documentation](https://zmk.dev/docs)
 - [ZMK Dev Container Setup](https://zmk.dev/docs/development/local-toolchain/setup/container)
