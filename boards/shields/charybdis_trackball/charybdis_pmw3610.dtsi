@@ -33,7 +33,14 @@
         reg = <0>;
         spi-max-frequency = <2000000>;
         irq-gpios = <&gpio0 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-        cpi = <800>;
+        /* 3200 = the PMW3610 maximum (binding: range 200-3200, step 200).
+           Must be a multiple of 200 - the driver does cpi/200 with integer
+           division, so e.g. 1700 silently becomes 1600, and out-of-range
+           returns -EINVAL and the sensor never initializes.
+           Paired with a 1:1 base scaler in config/trackball/charybdis_pointer.dtsi
+           for 3200 effective CPI. Keep the two files in sync.
+           If the cursor jitters while the ball is still, drop to 2400. */
+        cpi = <3200>;
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
@@ -43,12 +50,24 @@
         invert-x;
         invert-y;
 
-        force-awake;
+        /* DISABLED: force-awake made the driver rewrite the sensor's PERFORMANCE
+           register on every ZMK ACTIVE<->IDLE transition. That SPI write races the
+           interrupt-driven motion burst read, and because the MOTION irq is
+           level-triggered (GPIO_INT_LEVEL_ACTIVE), a corrupted burst that leaves
+           MOTION asserted makes the handler re-fire forever -> cursor runs to the
+           top-left and never stops. Reproducible ~31s after connect (IDLE_TIMEOUT).
+           Without the property, pmw3610_set_performance() returns before touching
+           SPI at all, so the sensor just uses its native downshift.
+           Trade-off: no 4ms sampling (we report at 8ms anyway, so it was 2x
+           oversampling) and the first move after ~2s idle may lag slightly
+           (REST1 = 100ms). Raise RUN_DOWNSHIFT_TIME_MS if that bothers. */
+
+        /* force-awake; */
         /* keep the sensor awake while ZMK activity state is ACTIVE,
            fallback to normal downshift mode after ZMK goes into IDLE / SLEEP mode.
            thus, the sensor would be a `wakeup-source` */
 
-        force-awake-4ms-mode;
+        /* force-awake-4ms-mode; */
         /* while force-awake is acitvated, enable this mode to force sampling per
            4ms, where the default sampling rate is 8ms. */
         /* NOTE: apply this mode if you need 250Hz with direct USB connection. */
