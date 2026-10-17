@@ -1,15 +1,30 @@
 #include <physical_layouts.dtsi>
 
+/*
+ * Two physical layouts live here. Only ONE may be enabled at a time, and
+ * `chosen { zmk,physical-layout = ... }` in charybdis.dtsi must point at it.
+ *
+ *   charybdis_physical_layout      3x6, 41 keys, &default_transform (12 cols)
+ *   charybdis_nano_physical_layout 3x5, 35 keys, &five_column_transform (10 cols)
+ *
+ * The 3x5 geometry is the 3x6 one with the outer column of each half removed
+ * and every x shifted by -100, so the column stagger and the gap between
+ * halves are preserved.
+ *
+ * To go back to 3x6: flip the two `status` values below, repoint `chosen`,
+ * and restore the 41-binding keymap plus the 3x6 combo/KEYS_* positions.
+ */
+
 / {
     charybdis_physical_layout: charybdis_physical_layout {
         compatible = "zmk,physical-layout";
         display-name = "Charybdis 3x6";
-        status = "okay";
+        status = "disabled";
         kscan = <&kscan0>;
         transform = <&default_transform>;
 
         keys
-            // Left Half - Main Keys
+            // Row 0 - left half then right half
             //                       w   h    x    y     rot    rx    ry
             = <&key_physical_attrs 100 100    0   38       0     0     0>
             , <&key_physical_attrs 100 100  100   38       0     0     0>
@@ -23,21 +38,22 @@
             , <&key_physical_attrs 100 100 1200   12       0     0     0>
             , <&key_physical_attrs 100 100 1300   38       0     0     0>
             , <&key_physical_attrs 100 100 1400   38       0     0     0>
+
+            // Row 1
             , <&key_physical_attrs 100 100    0  138       0     0     0>
             , <&key_physical_attrs 100 100  100  138       0     0     0>
             , <&key_physical_attrs 100 100  200  112       0     0     0>
             , <&key_physical_attrs 100 100  300  100       0     0     0>
             , <&key_physical_attrs 100 100  400  112       0     0     0>
             , <&key_physical_attrs 100 100  500  112       0     0     0>
-
-            // Right Half - Main Keys
-            //                       w   h    x    y     rot    rx    ry
             , <&key_physical_attrs 100 100  900  112       0     0     0>
             , <&key_physical_attrs 100 100 1000  112       0     0     0>
             , <&key_physical_attrs 100 100 1100  100       0     0     0>
             , <&key_physical_attrs 100 100 1200  112       0     0     0>
             , <&key_physical_attrs 100 100 1300  138       0     0     0>
             , <&key_physical_attrs 100 100 1400  138       0     0     0>
+
+            // Row 2
             , <&key_physical_attrs 100 100    0  238       0     0     0>
             , <&key_physical_attrs 100 100  100  238       0     0     0>
             , <&key_physical_attrs 100 100  200  212       0     0     0>
@@ -51,13 +67,68 @@
             , <&key_physical_attrs 100 100 1300  238       0     0     0>
             , <&key_physical_attrs 100 100 1400  238       0     0     0>
 
-            // Thumb Clusters
+            // Thumb clusters
             //                       w   h    x    y     rot    rx    ry
             , <&key_physical_attrs 100 100  348  314       0     0     0>
             , <&key_physical_attrs 100 100  348  314    1500   398   790>
             , <&key_physical_attrs 100 100  348  320    3000   398   790>
             , <&key_physical_attrs 100 100 1052  320 (-3000)  1102   790>
             , <&key_physical_attrs 100 100 1052  314 (-1500)  1102   790>
+            ;
+    };
+
+    charybdis_nano_physical_layout: charybdis_nano_physical_layout {
+        compatible = "zmk,physical-layout";
+        display-name = "Charybdis Nano 3x5";
+        status = "okay";
+        kscan = <&kscan0>;
+        transform = <&five_column_transform>;
+
+        keys
+            // Row 0 - left half (5) then right half (5)
+            //                       w   h    x    y     rot    rx    ry
+            = <&key_physical_attrs 100 100    0   38       0     0     0>
+            , <&key_physical_attrs 100 100  100   12       0     0     0>
+            , <&key_physical_attrs 100 100  200    0       0     0     0>
+            , <&key_physical_attrs 100 100  300   12       0     0     0>
+            , <&key_physical_attrs 100 100  400   12       0     0     0>
+            , <&key_physical_attrs 100 100  800   12       0     0     0>
+            , <&key_physical_attrs 100 100  900   12       0     0     0>
+            , <&key_physical_attrs 100 100 1000    0       0     0     0>
+            , <&key_physical_attrs 100 100 1100   12       0     0     0>
+            , <&key_physical_attrs 100 100 1200   38       0     0     0>
+
+            // Row 1
+            , <&key_physical_attrs 100 100    0  138       0     0     0>
+            , <&key_physical_attrs 100 100  100  112       0     0     0>
+            , <&key_physical_attrs 100 100  200  100       0     0     0>
+            , <&key_physical_attrs 100 100  300  112       0     0     0>
+            , <&key_physical_attrs 100 100  400  112       0     0     0>
+            , <&key_physical_attrs 100 100  800  112       0     0     0>
+            , <&key_physical_attrs 100 100  900  112       0     0     0>
+            , <&key_physical_attrs 100 100 1000  100       0     0     0>
+            , <&key_physical_attrs 100 100 1100  112       0     0     0>
+            , <&key_physical_attrs 100 100 1200  138       0     0     0>
+
+            // Row 2
+            , <&key_physical_attrs 100 100    0  238       0     0     0>
+            , <&key_physical_attrs 100 100  100  212       0     0     0>
+            , <&key_physical_attrs 100 100  200  200       0     0     0>
+            , <&key_physical_attrs 100 100  300  212       0     0     0>
+            , <&key_physical_attrs 100 100  400  212       0     0     0>
+            , <&key_physical_attrs 100 100  800  212       0     0     0>
+            , <&key_physical_attrs 100 100  900  212       0     0     0>
+            , <&key_physical_attrs 100 100 1000  200       0     0     0>
+            , <&key_physical_attrs 100 100 1100  212       0     0     0>
+            , <&key_physical_attrs 100 100 1200  238       0     0     0>
+
+            // Thumb clusters (same as 3x6, x and rx shifted by -100)
+            //                       w   h    x    y     rot    rx    ry
+            , <&key_physical_attrs 100 100  248  314       0     0     0>
+            , <&key_physical_attrs 100 100  248  314    1500   298   790>
+            , <&key_physical_attrs 100 100  248  320    3000   298   790>
+            , <&key_physical_attrs 100 100  952  320 (-3000)  1002   790>
+            , <&key_physical_attrs 100 100  952  314 (-1500)  1002   790>
             ;
     };
 };

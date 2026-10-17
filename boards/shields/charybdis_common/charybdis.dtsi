@@ -4,7 +4,9 @@
 / {
     chosen {
         zmk,kscan = &kscan0;
-        zmk,physical-layout = &charybdis_physical_layout;
+        /* 3x5 Charybdis Nano. Swap to &charybdis_physical_layout (and flip the
+           status values in config/charybdis-layouts.dtsi) to go back to 3x6. */
+        zmk,physical-layout = &charybdis_nano_physical_layout;
     };
 
     /* battery monitor*/
