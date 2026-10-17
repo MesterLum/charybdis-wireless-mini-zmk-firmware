@@ -1,7 +1,10 @@
 if SHIELD_CHARYBDIS_BT_RIGHT
 
+# Renamed from "Charybdis" so hosts see a brand-new device: the old name had
+# stale bonds on paired machines that blocked re-pairing (asymmetric bond).
+# Must stay <= 16 chars to fit the BLE advertising packet.
 config ZMK_KEYBOARD_NAME
-	default "Charybdis"
+	default "Chary Nano"
 
 config ZMK_SPLIT_BLE_ROLE_CENTRAL
 	default y
