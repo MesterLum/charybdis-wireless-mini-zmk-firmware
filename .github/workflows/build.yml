@@ -239,15 +239,11 @@ jobs:
         CONFIG_DIR="$GITHUB_WORKSPACE/config"
         BUILD_DIR=$(mktemp -d)
 
-        # Apply studio-rpc-usb-uart to USB central shields only.
-        # charybdis_right_bt is the central in BT split mode.
-        # charybdis_dongle is the central in dongle mode.
-        # Peripherals (left_bt, left_dongle, right_dongle) don't need it.
-        if [[ "$TARGET" == "charybdis_right_bt" || "$TARGET" == "charybdis_dongle" ]]; then
-          SNIPPET_OPTION="-DSNIPPET=studio-rpc-usb-uart"
-        else
-          SNIPPET_OPTION=""
-        fi
+        # studio-rpc-usb-uart is intentionally NOT applied: ZMK Studio is disabled
+        # (see charybdis_right_bt.conf and zmkfirmware/zmk#3195). The snippet sets
+        # up the USB CDC ACM that blocks the central from waking out of deep sleep,
+        # so it has to stay off even with CONFIG_ZMK_STUDIO=n.
+        SNIPPET_OPTION=""
 
         EXTRA_CONF_OPTION=""
         if [[ -n "${EXTRA_CONF_FILES:-}" ]]; then

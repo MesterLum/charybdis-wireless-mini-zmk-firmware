@@ -152,14 +152,11 @@ build_firmware() {
   printf 'Build Directory:\n'
   printf '  %s\n' "$build_dir"
 
-  # Apply studio-rpc-usb-uart to USB central shields only.
-  # charybdis_right_bt is the central in BT split mode.
-  # charybdis_dongle is the central in dongle mode.
-  # Skip when USB logging is enabled since both use USB CDC and conflict.
+  # studio-rpc-usb-uart is intentionally NOT applied: ZMK Studio is disabled
+  # (see charybdis_right_bt.conf and zmkfirmware/zmk#3195). The snippet sets up
+  # the USB CDC ACM that blocks the central from waking out of deep sleep, so it
+  # has to stay off even with CONFIG_ZMK_STUDIO=n.
   local extra_snippet=""
-  if [[ "$ENABLE_USB_LOGGING" != "true" ]] && [[ "$target" == "charybdis_right_bt" || "$target" == "charybdis_dongle" ]]; then
-    extra_snippet="-S studio-rpc-usb-uart"
-  fi
 
   # Enable USB logging if specified at the top of this script
   local usb_logging_snippet=""
