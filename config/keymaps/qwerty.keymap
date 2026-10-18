@@ -8,7 +8,6 @@
 #include <dt-bindings/zmk/ext_power.h>
 
 /* local overlays */
-#include "keymap_features/prospector_brightness.dtsi"
 #include "keymap_features/macros.dtsi"
 #include "keymap_features/behaviors.dtsi"
 #include "keymap_features/combos.dtsi"
@@ -25,139 +24,101 @@
 //                         30     31     32     33     34
 //                      ╰──────┴──────┴──────╯  ╰──────┴──────╯
 //
-// Converted from the 3x6 keymap by dropping the outer column of each half.
-// The 17 bindings that lived in those columns were relocated, not discarded:
-//   BASE   search/clip_hist/td_layers -> NUM row 0 left   TAB/DEL -> NAV
-//          FSLH -> SYM row 2
-//   NUM    KP_SLASH -> NUM row 2 left
-//   NAV    TAB -> NAV row 0 (position 02)
-//   SYM    BSLH, PIPE -> NUM row 2 left
-//   GAME   N1/N2/N3 -> GAME row 0 right
-//   EXTRAS studio_unlock, C_SLEEP, C_AL_COFFEE -> EXTRAS free slots
+// Cornix-style structure: 3 layers plus a tri-layer, down from the 8 this repo
+// shipped. Home-row mod ORDER matches the Cornix and the Link
+// (Shift Alt Ctrl Gui | Gui Ctrl Alt Shift), not the order this repo used.
+//
+// SCROLL and SLOW keep the trackball usable and their INDICES are referenced
+// from config/trackball/charybdis_pointer.dtsi - renumbering them means
+// editing that file too.
+//
+// Bootloader and sys_reset are deliberately NOT on any layer: they live on
+// same-hand combos in combos.dtsi so neither needs the other hand.
 //
 // #define BASE    0
-// #define NUM     1
-// #define NAV     2
-// #define SYM     3
-// #define GAME    4
-// #define EXTRAS  5
-// #define SLOW    6
-// #define SCROLL  7
+// #define LOWER   1   numbers, arrows           <- hold left thumb  (31)
+// #define RAISE   2   symbols                   <- hold right thumb (34)
+// #define SYSTEM  3   F-keys, bluetooth         <- hold 31 + 34 (tri-layer)
+// #define SCROLL  4   ball scrolls, J/K/L click <- hold left outer thumb (30)
+// #define SLOW    5   precision pointer         <- double-tap + hold 30
 
-// This shared keymap builds for prospector and non-prospector firmwares.
-// This stubs the key bindings that are contained in the prospector module
-// so non-prospector firmware can build.
-#ifndef CONFIG_SHIELD_PROSPECTOR_ADAPTER
-    behaviors {
-        /omit-if-no-ref/ pbl: prospector_brightness_stub {
-            compatible = "zmk,behavior-macro-two-param";
-            #binding-cells = <2>;
-            bindings = <&none>;
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+        tri_layer {
+            if-layers = <1 2>;
+            then-layer = <3>;
         };
     };
-#endif
 
     keymap {
         compatible = "zmk,keymap";
+
         BASE {
             display-name = "Base";
             bindings = <
-// ╭────────────────────┬─────────────────┬──────────────────┬──────────────────┬──────╮  ╭──────┬───────────────────┬───────────────────┬────────────────────┬─────────────────────────────╮
-    &kp Q                 &kp W             &kp E              &kp R              &kp T    &kp Y   &kp U               &kp I               &kp O                &kp P
-// ├────────────────────┼─────────────────┼──────────────────┼──────────────────┼──────┤  ├──────┼───────────────────┼───────────────────┼────────────────────┼─────────────────────────────┤
-    &ht_left_tp LCMD A    &ht_left LALT S   &ht_left LSHFT D   &ht_left LCTRL F   &kp G    &kp H   &ht_right RCTRL J   &ht_right RSHFT K   &ht_right_tp LALT L  &ht_right_tp RCMD SEMICOLON
-// ├────────────────────┼─────────────────┼──────────────────┼──────────────────┼──────┤  ├──────┼───────────────────┼───────────────────┼────────────────────┼─────────────────────────────┤
-    &kp Z                 &kp X             &kp C              &kp V              &kp B    &kp N   &kp M               &mm_cm_sc           &mm_pr_col           &mm_qm_ex
-// ╰────────────────────┴─────────────────┴──────────────────┼──────────────────┼──────┤  ├──────┼───────────────────┼───────────────────┴────────────────────┴─────────────────────────────╯
-                                            &td_esc_scrl_slow   &td_clk  &bs_num 1 BACKSPACE   &kp ENTER  &td_space_nav
-                                        // ╰──────────────────┴─────────┴──────╯  ╰──────────┴──────────────╯
+// ╭───────────────────┬───────────────┬────────────────┬───────────────┬──────╮  ╭──────┬─────────────────┬──────────────────┬───────────────────┬──────────────────────────────╮
+    &kp Q                &kp W           &kp E            &kp R           &kp T    &kp Y   &kp U             &kp I              &kp O               &kp P
+// ├───────────────────┼───────────────┼────────────────┼───────────────┼──────┤  ├──────┼─────────────────┼──────────────────┼───────────────────┼──────────────────────────────┤
+    &ht_left_tp LSHFT A  &ht_left LALT S &ht_left LCTRL D &ht_left LGUI F &kp G    &kp H   &ht_right RGUI J  &ht_right RCTRL K  &ht_right_tp RALT L &ht_right_tp RSHFT SEMICOLON
+// ├───────────────────┼───────────────┼────────────────┼───────────────┼──────┤  ├──────┼─────────────────┼──────────────────┼───────────────────┼──────────────────────────────┤
+    &kp Z                &kp X           &kp C            &kp V           &kp B    &kp N   &kp M             &mm_cm_sc          &mm_pr_col          &mm_qm_ex
+// ╰───────────────────┴───────────────┴────────────────┼───────────────┼──────┤  ├──────┼─────────────────┼──────────────────┴───────────────────┴──────────────────────────────╯
+                                          &td_esc_scrl_slow  &lt 1 TAB  &kp SPACE   &kp RET  &lt 2 BSPC
+                                      // ╰─────────────────┴──────────┴──────╯  ╰────────┴───────────╯
             >;
         };
 
-        NUM {
-            display-name = "Num";
+        LOWER {
+            display-name = "Lower";
             bindings = <
-// search, clip_hist and td_layers relocated here from the BASE outer columns.
-&kp C_AC_SEARCH  &clip_hist  &td_layers  &none          &none          &kp PLUS      &mm_f7  &mm_f8  &mm_f9  &mm_f10
-&none            &none       &none       &kp BACKSPACE  &kp LSHIFT     &kp KP_MINUS  &mm_f4  &mm_f5  &mm_f6  &mm_f11
-// BSLH and PIPE relocated here from SYM; KP_SLASH kept from the NUM outer column.
-&kp BSLH         &kp X       &kp PIPE    &kp KP_SLASH   &none          &kp EQUAL     &mm_f1  &mm_f2  &mm_f3  &mm_f12
-                                         &none          &none  &trans   &kp N0  &kp SPACE
+// Row 1 passes through to BASE so the home-row mods still chord with numbers.
+&kp N1  &kp N2  &kp N3  &kp N4  &kp N5      &kp N6    &kp N7     &kp N8     &kp N9     &kp N0
+&trans  &trans  &trans  &trans  &trans      &kp LEFT  &kp DOWN   &kp UP     &kp RIGHT  &kp SQT
+&none   &none   &none   &none   &none       &kp HOME  &kp PG_DN  &kp PG_UP  &kp END    &kp GRAVE
+                        &trans  &trans  &trans        &trans  &trans
             >;
         };
 
-        NAV {
-            display-name = "Nav";
+        RAISE {
+            display-name = "Raise";
             bindings = <
-// TAB and DEL relocated here from the BASE outer columns (comfortable: NAV is
-// held with the right thumb, so these left-hand keys are an opposite-hand reach).
-&msc MOVE_LEFT  &msc MOVE_UP    &kp TAB       &msc MOVE_DOWN   &msc MOVE_RIGHT   &detach_session  &create_or_attach  &next_pane  &show_sessions  &sync_panes
-&mkp MB4        &kp LALT        &kp LSHFT     &kp LCTRL        &mkp MB5          &h_split         &kp LEFT_ARROW     &kp DOWN    &kp UP          &kp RIGHT_ARROW
-&mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT  &kp DEL           &v_split         &kp HOME           &kp PG_DN   &kp PG_UP       &kp END
-                                              &none  &none  &none                &none  &trans
+&kp EXCL   &kp AT  &kp HASH  &kp DLLR   &kp PRCNT     &kp CARET  &kp AMPS   &kp ASTRK  &kp LPAR  &kp RPAR
+// < and > kept from the old SYM layer, same positions.
+&kp TILDE  &kp LT  &kp GT    &kp GRAVE  &kp BSLH      &kp MINUS  &kp EQUAL  &kp LBKT   &kp RBKT  &kp PIPE
+&none      &none   &none     &none      &none         &kp UNDER  &kp PLUS   &kp LBRC   &kp RBRC  &kp FSLH
+                             &trans     &trans  &trans           &trans  &trans
             >;
         };
 
-        SYM {
-            display-name = "Sym";
+        SYSTEM {
+            display-name = "System";
             bindings = <
-&kp TILDE  &kp DLLR   &kp CARET  &move_line_up    &mc_add_above   &kp AMPS   &kp PLUS      &kp LBKT  &kp RBKT  &kp PRCNT
-&kp UNDER  &kp LT     &kp GT     &kp BACKSPACE    &delete_line    &kp GRAVE  &kp KP_MINUS  &kp LPAR  &kp RPAR  &kp ASTRK
-// FSLH relocated here from the BASE/SYM outer column.
-&home_dir  &kp FSLH   &kp HASH   &move_line_down  &mc_add_below   &code_blk  &kp EQUAL     &kp LBRC  &kp RBRC  &kp AT
-                                 &none  &trans  &trans            &trans  &trans
-            >;
-        };
-
-        GAME {
-            display-name = "Game";
-            bindings = <
-// N1/N2/N3 relocated to the right half; the left outer column that held them is gone.
-&kp TAB    &kp Q  &kp W   &kp E      &kp R           &kp N1  &kp N2  &kp N3  &none  &none
-&kp LCTRL  &kp A  &kp S   &kp D      &kp F           &none   &none   &none   &none  &none
-&kp LSHFT  &kp Y  &kp X   &kp C      &kp V           &none   &none   &none   &none  &none
-                          &none   &kp SPACE  &kp LEFT_ALT    &none  &none
-            >;
-        };
-
-        EXTRAS {
-            display-name = "Xtra";
-            bindings = <
-&shrug          &lgtm           &gcm            &pbl PBL_INC    &kp C_BRIGHTNESS_INC   &out OUT_TOG     &bt BT_SEL 0    &bt BT_SEL 1       &bt BT_SEL 2     &bt BT_SEL 3
-// studio_unlock, C_AL_COFFEE and C_SLEEP relocated into the free slots.
-&sudo           &studio_unlock  &pbl PBL_TOG    &pbl PBL_DEC    &kp C_BRIGHTNESS_DEC   &kp C_AL_COFFEE  &kp C_PREVIOUS  &kp C_PLAY_PAUSE   &kp C_STOP       &kp C_NEXT
-&kp C_AC_UNDO   &kp C_AC_CUT    &kp C_AC_COPY   &kp C_AC_PASTE  &kp C_SLEEP            &new_dir         &kp K_MUTE      &kp C_VOLUME_DOWN  &kp C_VOLUME_UP  &kp PRINTSCREEN
-                                                &none  &none  &none                    &none  &none
-            >;
-        };
-
-        SLOW {
-            display-name = "Slow";
-            bindings = <
-// ╭────────┬────────┬────────┬────────┬────────╮  ╭────────┬────────┬────────┬────────┬────────╮
-    &trans    &trans   &trans   &trans   &trans      &trans   &trans   &trans   &trans   &trans
-// ├────────┼────────┼────────┼────────┼────────┤  ├────────┼────────┼────────┼────────┼────────┤
-    &trans    &trans   &trans   &trans   &trans      &trans   &trans   &trans   &trans   &trans
-// ├────────┼────────┼────────┼────────┼────────┤  ├────────┼────────┼────────┼────────┼────────┤
-    &trans    &trans   &trans   &trans   &trans      &trans   &trans   &trans   &trans   &trans
-// ╰────────┴────────┴────────┼────────┼────────┤  ├────────┼────────┼────────┴────────┴────────╯
-                                &trans   &trans      &trans   &trans   &trans
-                           // ╰────────┴────────┴────────╯  ╰────────┴────────╯
+&kp F1        &kp F2        &kp F3        &kp F4        &kp F5        &kp F6  &kp F7  &kp F8  &kp F9  &kp F10
+&bt BT_CLR    &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &none   &none   &none   &none   &kp F11
+&out OUT_TOG  &none         &none         &none         &none         &none   &none   &none   &none   &kp F12
+                                          &trans        &trans  &trans        &trans  &trans
             >;
         };
 
         SCROLL {
             display-name = "Scroll";
             bindings = <
-// ╭────────┬────────┬────────┬────────┬────────╮  ╭────────┬────────┬────────┬────────┬────────╮
-    &trans    &trans   &trans   &trans   &trans      &trans   &trans   &trans   &trans   &trans
-// ├────────┼────────┼────────┼────────┼────────┤  ├────────┼────────┼────────┼────────┼────────┤
-    &trans    &trans   &trans   &trans   &trans      &trans   &trans   &trans   &trans   &trans
-// ├────────┼────────┼────────┼────────┼────────┤  ├────────┼────────┼────────┼────────┼────────┤
-    &trans    &trans   &trans   &trans   &trans      &trans   &trans   &trans   &trans   &trans
-// ╰────────┴────────┴────────┼────────┼────────┤  ├────────┼────────┼────────┴────────┴────────╯
-                                &trans   &trans      &trans   &trans   &trans
-                           // ╰────────┴────────┴────────╯  ╰────────┴────────╯
+// Ball scrolls (see charybdis_pointer.dtsi). Clicks sit on J/K/L so one thumb
+// holds this layer while the other hand clicks without leaving home position.
+&trans  &trans  &trans  &trans  &trans      &trans  &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans      &trans  &mkp LCLK  &mkp RCLK  &mkp MCLK  &trans
+&trans  &trans  &trans  &trans  &trans      &trans  &trans     &trans     &trans     &trans
+                        &trans  &trans  &trans      &trans  &trans
+            >;
+        };
+
+        SLOW {
+            display-name = "Slow";
+            bindings = <
+&trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans  &trans  &trans
+                        &trans  &trans  &trans      &trans  &trans
             >;
         };
     };

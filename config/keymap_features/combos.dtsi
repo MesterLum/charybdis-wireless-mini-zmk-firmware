@@ -9,11 +9,13 @@
 //                         30     31     32     33     34
 //                      ╰──────┴──────┴──────╯  ╰──────┴──────╯
 //
-// Converted from 3x6 by dropping the outer column of each half:
-//   row 0: 3x6 1-10  -> 0-9      row 1: 3x6 13-22 -> 10-19
-//   row 2: 3x6 25-34 -> 20-29    thumbs: 3x6 36-40 -> 30-34
-// Five combos used the now-missing outer columns and were reassigned; each is
-// flagged below with its old 3x6 positions.
+// bootloader and sys_reset are SAME-HAND on purpose: top + bottom of one
+// column, a chord that never comes up while typing, and neither needs the
+// other half. That matters because the split link is exactly what you may be
+// trying to recover from.
+//
+//   outer column (00/20, 09/29)   -> bootloader
+//   second column (01/21, 08/28)  -> sys_reset
 
 / {
     combos {
@@ -21,92 +23,97 @@
 
         CapsWord {
             bindings = <&caps_word>;
-            key-positions = <14 15>;   // was <17 18> - G + H
+            key-positions = <14 15>;   // G + H
             layers = <0>;
         };
 
         combo_esc_left {
             bindings = <&kp ESC>;
-            key-positions = <0 1>;     // was <1 2> - Q + W
+            key-positions = <0 1>;     // Q + W
             layers = <0>;
         };
 
         combo_esc_right {
             bindings = <&kp ESC>;
-            key-positions = <8 9>;     // was <9 10> - O + P
+            key-positions = <8 9>;     // O + P
             layers = <0>;
         };
 
-        combo_BASE_or_EXTRAS {
-            bindings = <&td_bore>;
-            key-positions = <32 33>;   // was <38 39> - inner thumbs
-        };
-
+        /* Clicks also live on J/K/L in the SCROLL layer; these keep them
+           reachable from BASE without entering a layer. */
         combo_left_click {
             bindings = <&mkp LCLK>;
-            key-positions = <20 21>;   // was <25 26> - Z + X
+            key-positions = <20 21>;   // Z + X
         };
 
         combo_middle_click {
             bindings = <&mkp MCLK>;
-            key-positions = <21 22>;   // was <26 27> - X + C
+            key-positions = <21 22>;   // X + C
         };
 
         combo_right_click {
             bindings = <&mkp RCLK>;
-            key-positions = <22 23>;   // was <27 28> - C + V
+            key-positions = <22 23>;   // C + V
         };
 
-        /* REASSIGNED: old <0 24> were both in the dropped left outer column.
-           Now the left column's top and bottom keys. */
         combo_bootloader_left {
             bindings = <&bootloader>;
             key-positions = <0 20>;    // Q + Z
             layers = <0>;
         };
 
-        /* REASSIGNED: old <11 35> were both in the dropped right outer column.
-           Now the right column's top and bottom keys. */
         combo_bootloader_right {
             bindings = <&bootloader>;
             key-positions = <9 29>;    // P + ?/!
             layers = <0>;
         };
 
-        /* REASSIGNED: old <0 11> were both dropped. Still spans both halves,
-           so it stays hard to trigger by accident. */
+        /* NEW: this repo had no sys_reset binding at all. A soft MCU reset is
+           the thing you want when the split link drops, instead of reaching for
+           the physical button. */
+        combo_sys_reset_left {
+            bindings = <&sys_reset>;
+            key-positions = <1 21>;    // W + X
+            layers = <0>;
+        };
+
+        combo_sys_reset_right {
+            bindings = <&sys_reset>;
+            key-positions = <8 28>;    // O + .:
+            layers = <0>;
+        };
+
+        /* Clears the active BLE profile. Spans both halves so it cannot fire by
+           accident - but that also means it is useless while the split is down;
+           use settings_reset firmware in that case. */
         combo_bt_clear_safe {
             bindings = <&bt BT_CLR>;
             key-positions = <0 9>;     // Q + P (top corners)
             layers = <0>;
         };
 
-        /* REASSIGNED: old <24 25> included dropped position 24.
-           Moved to the free adjacent pair at the end of the left bottom row. */
         combo_prev_desktop {
             bindings = <&desktop_prev>;
             key-positions = <23 24>;   // V + B
             layers = <0>;
         };
 
-        /* REASSIGNED: old <34 35> included dropped position 35.
-           Mirrors prev_desktop on the right bottom row. */
         combo_next_desktop {
             bindings = <&desktop_next>;
-            key-positions = <28 29>;   // .>: + ?/!
+            key-positions = <28 29>;
             layers = <0>;
         };
 
         combo_all_windows {
             bindings = <&ht_combo_all_windows 0 0>;
-            key-positions = <27 28>;   // was <32 33>
+            key-positions = <27 28>;
             layers = <0>;
         };
 
         combo_app_windows {
             // KDE Present Windows (current app/window class).
             bindings = <&ht_combo_app_windows 0 0>;
-            key-positions = <26 27>;   // was <31 32>
+            key-positions = <26 27>;
             layers = <0>;
         };
     };

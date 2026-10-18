@@ -157,11 +157,18 @@
             hold-trigger-key-positions = <KEYS_R THUMBS>;
         };
 
+        // UNUSED after the Cornix-style restructure (commented out below):
+        //   td_space_nav, td_clk, td_layers, td_clk_scrl, td_bore.
+        // They embedded literal layer indices that no longer mean what they did
+        // (td_clk_scrl pointed at layer 8, which does not exist any more).
+        // Kept as comments so the old thumb behaviours are easy to restore.
         td_esc_scrl_slow: td_esc_scrl_slow {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <150>;
-            bindings = <&lt 7 ESC>, <&mo 6>; // hold, tap, double_tap
+            // SCROLL=4, SLOW=5 in the current keymap (were 7 and 6 before the
+            // Cornix-style restructure). Must match config/trackball/charybdis_pointer.dtsi.
+            bindings = <&lt 4 ESC>, <&mo 5>; // hold, tap, double_tap
         };
 
         lt_nav: nav_layer_tap {
@@ -172,12 +179,12 @@
             bindings = <&mo>, <&kp>;
         };
 
-        td_space_nav: td_space {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <110>;
-            bindings = <&lt_nav 2 SPACE>, <&kp SPACE>; // hold, tap, double_tap
-        };
+//         td_space_nav: td_space {
+//             compatible = "zmk,behavior-tap-dance";
+//             #binding-cells = <0>;
+//             tapping-term-ms = <110>;
+//             bindings = <&lt_nav 2 SPACE>, <&kp SPACE>; // hold, tap, double_tap
+//         };
 
         mo_clk: mo_click {
             compatible = "zmk,behavior-hold-tap";
@@ -188,12 +195,12 @@
             bindings = <&mo>, <&mkp>;
         };
 
-        td_clk: td_clk {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <170>;
-            bindings = <&mo_clk 3 LCLK>, <&mkp LCLK>; // hold, tap, double_tap
-        };
+//         td_clk: td_clk {
+//             compatible = "zmk,behavior-tap-dance";
+//             #binding-cells = <0>;
+//             tapping-term-ms = <170>;
+//             bindings = <&mo_clk 3 LCLK>, <&mkp LCLK>; // hold, tap, double_tap
+//         };
 
         bs_num: bs_num {
             compatible = "zmk,behavior-hold-tap";
@@ -213,24 +220,24 @@
             tapping-term-ms = <125>;
         };
 
-        td_layers: td_layer_swap {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            bindings = <&to 0>, <&to 4>; // tap, double_tap
-        };
+//         td_layers: td_layer_swap {
+//             compatible = "zmk,behavior-tap-dance";
+//             #binding-cells = <0>;
+//             bindings = <&to 0>, <&to 4>; // tap, double_tap
+//         };
 
-        td_clk_scrl: td_click_or_scroll {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <250>;
-            bindings = <&mkp RCLK>, <&mo 8>;  // tap/hold, double_tap
-        };
+//         td_clk_scrl: td_click_or_scroll {
+//             compatible = "zmk,behavior-tap-dance";
+//             #binding-cells = <0>;
+//             tapping-term-ms = <250>;
+//             bindings = <&mkp RCLK>, <&mo 8>;  // tap/hold, double_tap
+//         };
 
-        td_bore: BASE_or_EXTRA {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            bindings = <&mo 5>, <&to 0>;
-        };
+//         td_bore: BASE_or_EXTRA {
+//             compatible = "zmk,behavior-tap-dance";
+//             #binding-cells = <0>;
+//             bindings = <&mo 5>, <&to 0>;
+//         };
 
         // Combo action: tap switches to last app (Alt+Tab), hold opens "all windows" (Ctrl+F10).
         ht_combo_all_windows: ht_combo_all_windows {
