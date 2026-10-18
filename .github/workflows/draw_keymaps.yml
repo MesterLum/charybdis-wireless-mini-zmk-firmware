@@ -52,11 +52,11 @@ jobs:
       - name: Parse keymap
         run: |
           mkdir -p keymap-drawer/all_layers
-          keymap -c keymap-drawer/configs/config-stacked.yaml parse -c 12 -z config/keymaps/qwerty.keymap \
+          keymap -c keymap-drawer/configs/config-stacked.yaml parse -c 10 -z config/keymaps/qwerty.keymap \
             > keymap-drawer/stacked/qwerty.yaml
-          keymap -c keymap-drawer/configs/config-all-layers.yaml parse -c 12 -z config/keymaps/qwerty.keymap \
+          keymap -c keymap-drawer/configs/config-all-layers.yaml parse -c 10 -z config/keymaps/qwerty.keymap \
             > keymap-drawer/all_layers/qwerty.yaml
-          keymap -c keymap-drawer/configs/config-combo.yaml parse -c 12 --virtual-layers "COMBOS" -z config/keymaps/qwerty.keymap \
+          keymap -c keymap-drawer/configs/config-combo.yaml parse -c 10 --virtual-layers "COMBOS" -z config/keymaps/qwerty.keymap \
             > keymap-drawer/stacked/combos.yaml
 
       - name: Generate stacked YAML
@@ -89,13 +89,14 @@ jobs:
 
       - name: Draw stacked keymap
         run: |
-          keymap -c keymap-drawer/configs/config-stacked.yaml draw -j config/qwerty.json \
+          keymap -c keymap-drawer/configs/config-stacked.yaml draw -j config/qwerty.json -l five_column_transform \
             keymap-drawer/stacked/stacked.yaml > keymap-drawer/stacked/stacked.svg
 
       - name: Draw combos
         run: |
           keymap -c keymap-drawer/configs/config-combo.yaml draw \
             -j config/qwerty.json \
+            -l five_column_transform \
             -s "COMBOS" \
             --combos-only \
             keymap-drawer/stacked/combos-merged.yaml > keymap-drawer/stacked/combos.svg
@@ -109,7 +110,7 @@ jobs:
       - name: Draw all-layers keymap
         run: |
           mkdir -p keymap-drawer/all_layers
-          keymap -c keymap-drawer/configs/config-all-layers.yaml draw -j config/qwerty.json \
+          keymap -c keymap-drawer/configs/config-all-layers.yaml draw -j config/qwerty.json -l five_column_transform \
             keymap-drawer/all_layers/qwerty.yaml > keymap-drawer/all_layers/all_layers.svg --keys-only
 
       - name: Export composite legend-wrap overrides from stacked config

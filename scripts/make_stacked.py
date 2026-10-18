@@ -2,7 +2,7 @@
 """
 Generate keymap-drawer/stacked/stacked.yaml from keymap-drawer/stacked/qwerty.yaml.
 
-Each key in the output carries legend slots from five source layers:
+Each key in the output carries legend slots from the source layers:
 
   Slot  Position    Layer   Color (see configs/config-stacked.yaml svg_extra_style)
   ----  ----------  ------  ------
@@ -24,11 +24,15 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent.parent
 
 # Layers to include and which slot each maps to (order matters for output dict)
+# Slots follow the thumb that activates each layer: Lower is the left thumb,
+# Raise the right one, System is both (tri-layer), Scroll the outer left thumb.
+# Renamed from the old 8-layer keymap (Xtra/Num/Nav/Sym) when it was restructured
+# Cornix-style - these strings must match `display-name` in the keymap.
 SLOT_MAP = [
-    ("Xtra", "tl"),
-    ("Num",  "tr"),
-    ("Nav",  "bl"),
-    ("Sym",  "br"),
+    ("Lower",  "tl"),
+    ("Raise",  "tr"),
+    ("System", "bl"),
+    ("Scroll", "br"),
 ]
 
 

@@ -65,16 +65,16 @@ draw_config:
     /* Base - center - neutral white  */
     text.tap { font-family: "JetBrainsMono Nerd Font"; fill: var(--all-tap); font-size: 16px; }
 
-    /* Nav  - top-left - blue  */
+    /* Lower  - top-left - blue  */
     text.tl  { font-family: "JetBrainsMono Nerd Font"; fill: var(--all-corner); font-size: 11px; font-weight: 600; fill-opacity: 1; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; transform: translate(2px, 2px); }
 
-    /* Num  - top-right- green */
+    /* Raise  - top-right- green */
     text.tr  { font-family: "JetBrainsMono Nerd Font"; fill: var(--all-corner); font-size: 11px; font-weight: 600; fill-opacity: 1; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; transform: translate(-2px, 2px); }
 
-    /* Xtra - bot-left - purple */
+    /* System - bot-left - purple */
     text.bl  { font-family: "JetBrainsMono Nerd Font"; fill: var(--all-corner); font-size: 11px; font-weight: 600; fill-opacity: 1; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; transform: translate(2px, -2px); }
 
-    /* Sym  - bot-right- yellow */
+    /* Scroll - bot-right- yellow */
     text.br  { font-family: "JetBrainsMono Nerd Font"; fill: var(--all-corner); font-size: 11px; font-weight: 600; fill-opacity: 1; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; transform: translate(-2px, -2px); }
 
   shrink_wide_legends: 7

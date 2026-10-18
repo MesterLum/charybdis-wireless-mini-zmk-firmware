@@ -133,16 +133,16 @@ draw_config:
     /* Base - center */
     text.tap { font-family: "JetBrainsMono Nerd Font"; fill: var(--stack-tap); font-size: 16px; }
 
-    /* Xtra - top-left */
+    /* Lower  - top-left */
     text.tl  { font-family: "JetBrainsMono Nerd Font"; fill: var(--stack-tl); font-size: 11px; font-weight: 600; fill-opacity: 1; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; transform: translate(2px, 2px); }
 
-    /* Num  - top-right */
+    /* Raise  - top-right */
     text.tr  { font-family: "JetBrainsMono Nerd Font"; fill: var(--stack-tr); font-size: 11px; font-weight: 600; fill-opacity: 1; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; transform: translate(-2px, 2px); }
 
-    /* Nav  - bot-left */
+    /* System - bot-left */
     text.bl  { font-family: "JetBrainsMono Nerd Font"; fill: var(--stack-bl); font-size: 11px; font-weight: 600; fill-opacity: 1; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; transform: translate(2px, -2px); }
 
-    /* Sym  - bot-right */
+    /* Scroll - bot-right */
     text.br  { font-family: "JetBrainsMono Nerd Font"; fill: var(--stack-br); font-size: 11px; font-weight: 600; fill-opacity: 1; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; transform: translate(-2px, -2px); }
 
   shrink_wide_legends: 7

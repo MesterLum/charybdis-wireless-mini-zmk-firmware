@@ -2,7 +2,17 @@
 
 ## Intro
 
-This repository offers pre-configured ZMK firmware. It's designed for the [Wireless Charybdis keyboards](https://github.com/280Zo/charybdis-wireless-mini-3x6-build-guide?tab=readme-ov-file), but is easily adaptable to other platforms. It supports the latest stable ZMK release (v0.4.1) with full Bluetooth/USB split and dongle build support (including Prospector dongles with displays), and uses the latest input listeners and processors for responsive pointer and scroll behavior.
+This repository offers pre-configured ZMK firmware for the [Wireless Charybdis
+keyboards](https://github.com/280Zo/charybdis-wireless-mini-3x6-build-guide?tab=readme-ov-file).
+
+> [!IMPORTANT]
+> This fork is configured for the **3x5 Charybdis Nano** (35 keys), not the 3x6.
+> It builds **Bluetooth split only**, and the Prospector support is the
+> **scanner** (a standalone listening device), not the display dongle.
+> See [Differences from upstream](#differences-from-upstream).
+
+It tracks ZMK `main` and uses the current input listeners and processors for
+responsive pointer and scroll behavior.
 
 ## Overview & Usage
 
@@ -19,63 +29,87 @@ To see all the layers check out the [full render](keymap-drawer/all_layers/all_l
 
 
 **Keyboard Layers**
-| # | Layer      | Purpose                                                          |
-| - | ---------- | ---------------------------------------------------------------- |
-| 0 | **BASE**   | Standard typing with timeless home-row mods                      |
-| 1 | **NUM**    | Combined digits + F-keys (tap for numbers, shift for functions)  |
-| 2 | **NAV**    | Arrow keys, paging, TMUX navigation, mouse pointer               |
-| 3 | **SYM**    | Symbols, punctuation, and a couple of helpers                    |
-| 4 | **GAME**   | Gaming layer (just key-codes, no mods)                           |
-| 5 | **EXTRAS** | Shortcuts, functions & snippets                                  |
-| 6 | **MOUSE**  | Full mouse-key layer (pointer + wheel)                           |
-| 7 | **SLOW**   | Low-speed pointer for precision pointer                          |
-| 8 | **SCROLL** | Vertical/Horizontal scroll layer                                 |
+| # | Layer      | Purpose                                              | Reached by                     |
+| - | ---------- | ---------------------------------------------------- | ------------------------------ |
+| 0 | **BASE**   | Typing, with timeless home-row mods                  | default                        |
+| 1 | **LOWER**  | Numbers and arrows                                   | hold TAB (left inner thumb)    |
+| 2 | **RAISE**  | Symbols                                              | hold BSPC (right outer thumb)  |
+| 3 | **SYSTEM** | F-keys, Bluetooth profiles, output toggle            | hold LOWER + RAISE (tri-layer) |
+| 4 | **SCROLL** | Trackball becomes a scroll wheel; J/K/L click        | hold ESC (left outer thumb)    |
+| 5 | **SLOW**   | Low-speed pointer for precision                      | double-tap + hold ESC          |
 
 
 **Home-Row Mods**
-| Side                | Hold = Modifier              | Tap = Letter / Key  |
-| ------------------- | ---------------------------- | ------------------- |
-| Left                | **Gui / Alt / Shift / Ctrl** | `A S D F`           |
-| Right               | **Ctrl / Shift / Alt / Gui** | `J K L ;`           |
+| Side  | Hold = Modifier              | Tap = Letter / Key |
+| ----- | ---------------------------- | ------------------ |
+| Left  | **Shift / Alt / Ctrl / Gui** | `A S D F`          |
+| Right | **Gui / Ctrl / Alt / Shift** | `J K L ;`          |
+
+Side-aware: each key only becomes a modifier if the opposite half is also
+active, so one-handed rolls never trigger a mod. `A`, `L` and `;` use
+tap-preferred variants to further reduce misfires.
 
 
-**Combos**
-| Trigger Keys              | Result                                  |
-| ------------------------- | --------------------------------------  |
-| `K17 + K18`                | **Caps Word** (one-shot words in CAPS) |
-| `K25 + K26`                | **Left Mouse Button**                  |
-| `K26 + K27`                | **Middle Mouse Button**                |
-| `K27 + K28`                | **Right Mouse Button**                 |
-| `K13 + K22`                | Toggle **MOUSE** layer                 |
-| `K38 + K39` (thumb cluster)| Layer-swap **BASE / EXTRAS**           |
+**Combos** (key positions, 3x5 numbering — see `config/keymap_features/combos.dtsi`)
+| Trigger                   | Result                                    |
+| ------------------------- | ----------------------------------------- |
+| `G + H`                   | **Caps Word**                             |
+| `Q + W` / `O + P`         | **Esc** (either hand)                     |
+| `Z + X`                   | **Left click**                            |
+| `X + C`                   | **Middle click**                          |
+| `C + V`                   | **Right click**                           |
+| `Q + Z` / `P + ?`         | **Bootloader** (same hand, either side)   |
+| `W + X` / `O + .`         | **Soft reset** (same hand, either side)   |
+| `Q + P`                   | **BT CLR** (clears the active profile)    |
+| `V + B` / `. + ?`         | Previous / next desktop                   |
+| `, + .` / `M + ,`         | All windows / app windows                 |
+
+Bootloader and reset are deliberately **same-hand** — top plus bottom of one
+column. Neither needs the other half, which matters when the split link is
+exactly what you are trying to recover from.
 
 
 **Other Highlights**
-- This repo now includes builds for the **[Prospector ZMK screen dongle](https://github.com/carrefinho/prospector)**.
-  - Suppoert for the Nice!Nano v2 has been added to the firmware options.
-  - The prospector case has been adapted in [OnShape](https://cad.onshape.com/documents/1ab8632c0729c14a80991694/w/0a5575e0aa91142d15642877/e/053f9ce9786904291254a911) to fit the Nice!Nano v2.
-  Options are also available for the smaller APDS9960 ambient light sensor variant, and a lower-cost Waveshare non-touch screen option (SKU 24382)
-  - APDS9960 sensor builds use a custom Prospector module ALS-only driver that works with the various APDS9960 sensor types.
-- **Timeless-inspired home row mods:** Based on [urob's](https://github.com/urob/zmk-config#timeless-homerow-mods) work and configured on the BASE layer.
-- **Thumb-scroll mode:** Hold the left-most thumb button (K36) while moving the trackball to turn motion into scroll.
-- **Precision cursor mode:** Double-tap, then hold K36 to drop the pointer speed, release to return to normal speed.
-- **K37 - Multifunction**
-  - Tap: Left mouse click
-  - Tap & Hold: Layer 3 (symbols) while the key is held
-  - Double-Tap & Hold: holds the left mouse button
-  - Tripple-Tap: Double mouse click
-- **K38 - Multifunction**
-  - Tap: Backspace
-  - Hold: Layer 1 (numbers) while the key is held
-  - Quick tap, then hold: Repeats Backspace instead of dropping into Layer 1
-- **Bluetooth profile quick-swap:** Jump to the EXTRAS layer and tap the dedicated BT-select keys to pair or switch among up to four saved hosts (plus BT CLR to forget all).
-- **Prospector display brightness controls:** Prospector builds can toggle between ambient-light and manual brightness control from the EXTRAS layer. On Colemak-DH, K04 brightens, K15 toggles auto/manual, and K16 dims.
-- **PMW3610 low power trackball sensor driver:** Provided by [badjeff](https://github.com/badjeff/zmk-pmw3610-driver)
-  - Patched to prevent cursor jump on wake
-- **Hold-tap side-aware triggers:** Each HRM key only becomes a modifier if the opposite half is active, preventing accidental holds while one-handed.
-- **Timeless HRM with selective exceptions:** Base home-row mods use the timeless-style `balanced + hold-trigger-on-release` setup, while A, I, and O (on a Colemak-DH layout) keep tap-preferred variants to reduce accidental mod triggers during fast rolls.
-- **ZMK Studio:** Supported on Bluetooth and the standard no-screen dongle builds for quick keymap adjustments. Prospector screen builds disable it to preserve RAM.
+- **Prospector Scanner support:** the central broadcasts its status over BLE
+  advertisements for a standalone [Prospector scanner](https://github.com/t-ogura/zmk-config-prospector)
+  to display. The scanner never joins the split, so the keyboard stays a plain
+  BT split.
+- **Timeless-inspired home row mods:** based on [urob's](https://github.com/urob/zmk-config#timeless-homerow-mods)
+  work, side-aware so a mod only fires when the opposite half participates.
+  `A`, `L` and `;` use tap-preferred variants to reduce misfires on fast rolls.
+- **Thumb-scroll mode:** hold the left outer thumb (position 30) and move the
+  ball to scroll. Works on both axes, so sideways motion scrolls horizontally.
+  High-resolution scrolling is on, so it is pixel-smooth rather than notched.
+- **Precision cursor mode:** double-tap then hold that same thumb to drop the
+  pointer speed; release to return to normal.
+- **Clicks within reach:** `J` / `K` / `L` become left / right / middle click on
+  the SCROLL layer, so one thumb holds while the other hand clicks from home
+  position. The `Z+X` / `X+C` / `C+V` combos also work straight from BASE.
+- **Tri-layer:** holding both layer thumbs opens SYSTEM, so F-keys and
+  Bluetooth profiles cost no dedicated key.
+- **Same-hand bootloader and reset:** neither needs the other half — see the
+  combo table above.
+- **PMW3610 low power trackball sensor driver:** provided by
+  [badjeff](https://github.com/badjeff/zmk-pmw3610-driver), tuned here to
+  3200 CPI with the speed set by the input scaler instead of the sensor, so
+  granularity stays fine at any pointer speed.
 
+
+## Differences from upstream
+
+Things this fork does differently, and why — each is reversible and the
+reasoning is repeated in a comment at the point of change.
+
+| Change | Where | Why |
+| ------ | ----- | --- |
+| **3x5 layout** (35 keys) | `config/charybdis-layouts.dtsi`, `charybdis.dtsi` | Hardware is a Charybdis Nano. `five_column_transform` already existed upstream but no physical layout referenced it. |
+| **Keymap restructured** to 6 layers | `config/keymaps/qwerty.keymap` | Cornix-style: BASE + LOWER + RAISE + tri-layer, plus the two trackball layers. Down from 8. |
+| **Home-row mod order** `Shift Alt Ctrl Gui` | same | Matches the owner's other boards. Upstream used `Gui Alt Shift Ctrl`. |
+| **ZMK Studio disabled** | `charybdis_right_bt.conf`, both build scripts | Workaround for [zmk#3195](https://github.com/zmkfirmware/zmk/issues/3195): a split central with `ZMK_SLEEP=y` + `ZMK_STUDIO=y` on Zephyr 4.1 cannot wake from deep sleep and needs a physical reset. The `studio-rpc-usb-uart` snippet has to go too — it sets up the same USB CDC ACM independently. |
+| **BLE passkey entry disabled** | `config/charybdis/charybdis.conf` | `ZMK_BLE_EXPERIMENTAL_FEATURES` pulls it in implicitly. It forces typing a 6-digit code on the keyboard, impractical when the digits live on a held layer, and every failed attempt leaves a half-bonded profile. |
+| **`force-awake` off** on the sensor | `charybdis_pmw3610.dtsi` | It made the driver rewrite the sensor's PERFORMANCE register on every idle transition. That SPI write races the interrupt-driven motion read, and with a level-triggered MOTION irq a corrupted burst makes the cursor run away and never stop. |
+| **Prospector module swapped** | `config/west.yml` | `t-ogura` (scanner) replaces `280Zo` (display dongle). West forbids two projects with the same name, so the `dongle_prospector_*` build entries no longer build. |
+| **Device renamed** `Chary Nano` | `Kconfig.bt.defconfig` | Hosts held stale bonds under the old name that blocked re-pairing. |
 
 ## Flash the Firmware
 
@@ -98,12 +132,28 @@ Download your choice of firmware from the Releases page. Choose a combination of
 
 ### Modify Key Mappings
 
-**ZMK Studio**
+**ZMK Studio — disabled in this fork**
 
-[ZMK Studio](https://zmk.studio/) allows users to update functionality during runtime. It is supported on Bluetooth builds and the standard no-screen dongle build. For more details on how to use ZMK Studio, refer to the [ZMK documentation](https://zmk.dev/docs/features/studio).
+[ZMK Studio](https://zmk.studio/) lets you edit the keymap at runtime, but it is
+turned off here and the keymap has to be edited and reflashed instead.
 
-> [!NOTE]
-> Prospector screen builds disable ZMK Studio to preserve RAM and improve stability with the display stack.
+The reason is [zmk#3195](https://github.com/zmkfirmware/zmk/issues/3195): on ZMK
+`main` with Zephyr 4.1, a split **central** with both `ZMK_SLEEP=y` and
+`ZMK_STUDIO=y` cannot wake from deep sleep. The peripheral wakes fine, so the
+keyboard looks like it lost the other half, and only the physical reset button
+recovers it. Disabling Studio is the workaround confirmed in that issue.
+
+To re-enable it you need **three** changes, not one — Studio's USB CDC ACM also
+arrives via a build snippet:
+
+1. `CONFIG_ZMK_STUDIO=y` (plus the three locking options) in
+   [charybdis_right_bt.conf](boards/shields/charybdis_right_bt/charybdis_right_bt.conf)
+2. restore `-S studio-rpc-usb-uart` in [build_setup.sh](local-build/build_setup.sh)
+   and `-DSNIPPET=studio-rpc-usb-uart` in
+   [build.yml](.github/workflows/build.yml)
+3. put `&studio_unlock` back on a key in [qwerty.keymap](config/keymaps/qwerty.keymap)
+
+Expect the wake bug to come back unless you also set `CONFIG_ZMK_SLEEP=n`.
 
 
 **Edit Keymap Directly**
@@ -128,31 +178,41 @@ To change which firmware families are built:
 
 The main build families are:
 
-- `bt`: Bluetooth split builds
-- `dongle_standard_nano`: the default no-screen dongle builds
+- `bt`: Bluetooth split builds — **the only family this fork builds**
+- `dongle_standard_nano`: no-screen dongle builds
 - `dongle_prospector_*`: screen-enabled dongle builds using the Prospector adapter
 
-For any of the Prospector dongle firmwares, there are additional customization options.
+> [!WARNING]
+> The `dongle_*` entries **do not build in this fork.** `config/west.yml` swapped
+> `prospector-zmk-module` from `280Zo` (display dongle) to `t-ogura` (scanner),
+> and west does not allow two projects with the same name. The dongle configs
+> under `config/dongle_prospector*` are left in place but unused.
+>
+> To get them back, point the module at `280Zo` again — and note that doing so
+> removes the keyboard-side status advertisement the scanner relies on.
 
-To change the Prospector layout:
+### Prospector Scanner
 
-1. Open [build.yaml](build.yaml)
-2. Find the Prospector build entry you want
-3. Replace the selected file under `extra_conf_files` with a different layout file from [config/dongle_prospector_layouts](config/dongle_prospector_layouts)
+This fork supports the [Prospector **scanner**](https://github.com/t-ogura/zmk-config-prospector):
+a standalone device that passively listens to BLE status advertisements. It does
+not join the split, so the keyboard remains an ordinary BT split.
 
-To change the Radii theme:
-
-1. Select `dongle_prospector_layout_radii.conf` in `extra_conf_files`
-2. Add one theme overlay from [config/dongle_prospector_themes](config/dongle_prospector_themes) to `extra_dtc_overlay_files`
-
-For Prospector builds with the APDS9960 ambient light sensor, [config/dongle_prospector/dongle_prospector_sensor.conf](config/dongle_prospector/dongle_prospector_sensor.conf) intentionally turns off Zephyr's stock APDS9960 driver and enables the Prospector module's replacement driver:
+The keyboard side is three settings in
+[charybdis_right_bt.conf](boards/shields/charybdis_right_bt/charybdis_right_bt.conf),
+on the central only:
 
 ```conf
-CONFIG_APDS9960=n
-CONFIG_PROSPECTOR_APDS9960=y
+CONFIG_ZMK_STATUS_ADVERTISEMENT=y
+CONFIG_ZMK_STATUS_ADV_KEYBOARD_NAME="ChryNano"   # max 8 chars
+CONFIG_ZMK_STATUS_ADV_CENTRAL_SIDE="RIGHT"
+CONFIG_ZMK_STATUS_ADV_ACTIVE_INTERVAL_MS=1000    # 1Hz; the default 200 is 5x the radio traffic
 ```
 
-That keeps the application using the normal Zephyr sensor API while letting the Prospector module provide the APDS9960 behavior needed for variations in the APDS9960 sensors.
+Layer, modifier and profile changes are sent as an immediate burst regardless of
+that interval, so 1 Hz only slows the battery/WPM refresh — not the layer
+indicator.
+
+The scanner firmware itself is built from its own repository, not this one.
 
 ### Modify Keymap Selection
 
