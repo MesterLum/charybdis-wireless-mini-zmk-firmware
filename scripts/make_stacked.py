@@ -28,11 +28,14 @@ SCRIPT_DIR = Path(__file__).parent.parent
 # Raise the right one, System is both (tri-layer), Scroll the outer left thumb.
 # Renamed from the old 8-layer keymap (Xtra/Num/Nav/Sym) when it was restructured
 # Cornix-style - these strings must match `display-name` in the keymap.
+# Mouse rather than Scroll in the last slot: after the layers were inverted,
+# Scroll is all &trans (its behaviour lives in the pointer processors, not in
+# bindings) so that corner would have rendered empty. Mouse carries the clicks.
 SLOT_MAP = [
     ("Lower",  "tl"),
     ("Raise",  "tr"),
     ("System", "bl"),
-    ("Scroll", "br"),
+    ("Mouse",  "br"),
 ]
 
 

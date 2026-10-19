@@ -39,8 +39,24 @@
 // #define LOWER   1   numbers, arrows           <- hold left thumb  (31)
 // #define RAISE   2   symbols                   <- hold right thumb (34)
 // #define SYSTEM  3   F-keys, bluetooth         <- hold 31 + 34 (tri-layer)
-// #define SCROLL  4   ball scrolls, J/K/L click <- hold left outer thumb (30)
-// #define SLOW    5   precision pointer         <- double-tap + hold 30
+//   BT_SEL 0-4: all five profiles. The count is not a Kconfig - zmk/ble.h
+//   computes it as BT_MAX_PAIRED(6) - SPLIT_BLE_CENTRAL_PERIPHERALS(1) = 5.
+// #define MOUSE   4   ball still aims + J/K/L click <- hold left outer thumb (30)
+// #define SLOW    5   precision pointer, ~267 CPI    <- hold 30, then A
+// #define SCROLL  6   ball becomes a scroll wheel    <- hold 30, then Z
+//
+// MOUSE has no pointer override, so SLOW and SCROLL can hang off it without
+// fighting it. Nesting SLOW inside SCROLL silently did nothing: both matched,
+// and the first override declared in charybdis_pointer.dtsi won.
+//
+// Thumb 30 is a plain &mo, NOT a tap-dance. The tap-dance it replaced made the
+// layer wait out its 150ms tapping term before even consulting its hold-tap,
+// so clicks on this layer were 300ms+ away. &mo has no timing logic at all.
+// ESC moved to the LOWER/RAISE thumbs (Cornix-style) for the same reason: as a
+// tap-dance tap it had to wait 150ms to rule out a second tap.
+//
+// Row 3 right is &kp COMMA/DOT/FSLH, not the mm_* mod-morphs. Those overrode
+// the natural shifted symbols, which made < > and ? unreachable.
 
     conditional_layers {
         compatible = "zmk,conditional-layers";
@@ -61,9 +77,9 @@
 // ├───────────────────┼───────────────┼────────────────┼───────────────┼──────┤  ├──────┼─────────────────┼──────────────────┼───────────────────┼──────────────────────────────┤
     &ht_left_tp LSHFT A  &ht_left LALT S &ht_left LCTRL D &ht_left LGUI F &kp G    &kp H   &ht_right RGUI J  &ht_right RCTRL K  &ht_right_tp RALT L &ht_right_tp RSHFT SEMICOLON
 // ├───────────────────┼───────────────┼────────────────┼───────────────┼──────┤  ├──────┼─────────────────┼──────────────────┼───────────────────┼──────────────────────────────┤
-    &kp Z                &kp X           &kp C            &kp V           &kp B    &kp N   &kp M             &mm_cm_sc          &mm_pr_col          &mm_qm_ex
+    &kp Z                &kp X           &kp C            &kp V           &kp B    &kp N   &kp M             &kp COMMA          &kp DOT             &kp FSLH
 // ╰───────────────────┴───────────────┴────────────────┼───────────────┼──────┤  ├──────┼─────────────────┼──────────────────┴───────────────────┴──────────────────────────────╯
-                                          &td_esc_scrl_slow  &lt 1 TAB  &kp SPACE   &kp RET  &lt 2 BSPC
+                                          &mo 4              &lt 1 TAB  &kp SPACE   &kp RET  &lt 2 BSPC
                                       // ╰─────────────────┴──────────┴──────╯  ╰────────┴───────────╯
             >;
         };
@@ -75,7 +91,7 @@
 &kp N1  &kp N2  &kp N3  &kp N4  &kp N5      &kp N6    &kp N7     &kp N8     &kp N9     &kp N0
 &trans  &trans  &trans  &trans  &trans      &kp LEFT  &kp DOWN   &kp UP     &kp RIGHT  &kp SQT
 &none   &none   &none   &none   &none       &kp HOME  &kp PG_DN  &kp PG_UP  &kp END    &kp GRAVE
-                        &trans  &trans  &trans        &trans  &trans
+                        &trans  &trans  &kp ESC       &trans  &trans
             >;
         };
 
@@ -86,7 +102,7 @@
 // < and > kept from the old SYM layer, same positions.
 &kp TILDE  &kp LT  &kp GT    &kp GRAVE  &kp BSLH      &kp MINUS  &kp EQUAL  &kp LBKT   &kp RBKT  &kp PIPE
 &none      &none   &none     &none      &none         &kp UNDER  &kp PLUS   &kp LBRC   &kp RBRC  &kp FSLH
-                             &trans     &trans  &trans           &trans  &trans
+                             &trans     &trans  &kp ESC          &trans  &trans
             >;
         };
 
@@ -94,17 +110,28 @@
             display-name = "System";
             bindings = <
 &kp F1        &kp F2        &kp F3        &kp F4        &kp F5        &kp F6  &kp F7  &kp F8  &kp F9  &kp F10
-&bt BT_CLR    &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &none   &none   &none   &none   &kp F11
+&bt BT_CLR    &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4  &none  &none  &none  &kp F11
 &out OUT_TOG  &none         &none         &none         &none         &none   &none   &none   &none   &kp F12
                                           &trans        &trans  &trans        &trans  &trans
             >;
         };
 
-        SCROLL {
-            display-name = "Scroll";
+        MOUSE {
+            display-name = "Mouse";
             bindings = <
-// Ball scrolls (see charybdis_pointer.dtsi). Clicks sit on J/K/L so one thumb
-// holds this layer while the other hand clicks without leaving home position.
+// The ball keeps moving the pointer here - this layer has NO pointer override
+// in charybdis_pointer.dtsi - so you can still aim while clicking.
+//   A = hold for precision (SLOW)      Z = hold for scroll
+&trans  &trans  &trans  &trans  &trans      &trans  &trans     &trans     &trans     &trans
+&mo 5   &trans  &trans  &trans  &trans      &trans  &mkp LCLK  &mkp RCLK  &mkp MCLK  &trans
+&mo 6   &trans  &trans  &trans  &trans      &trans  &trans     &trans     &trans     &trans
+                        &trans  &trans  &trans      &trans  &trans
+            >;
+        };
+
+        SLOW {
+            display-name = "Slow";
+            bindings = <
 &trans  &trans  &trans  &trans  &trans      &trans  &trans     &trans     &trans     &trans
 &trans  &trans  &trans  &trans  &trans      &trans  &mkp LCLK  &mkp RCLK  &mkp MCLK  &trans
 &trans  &trans  &trans  &trans  &trans      &trans  &trans     &trans     &trans     &trans
@@ -112,8 +139,8 @@
             >;
         };
 
-        SLOW {
-            display-name = "Slow";
+        SCROLL {
+            display-name = "Scroll";
             bindings = <
 &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans  &trans  &trans
